@@ -23,7 +23,7 @@ import {
     createBurnCheckedInstruction,
     createMintToCheckedInstruction
 } from "@solana/spl-token"
-import { createCreateMetadataAccountV3Instruction } from "@metaplex-foundation/mpl-token-metadata"
+import {createCreateMetadataAccountV3Instruction} from "@metaplex-foundation/mpl-token-metadata"
 import {
     bundlrStorage,
     keypairIdentity,
@@ -31,11 +31,12 @@ import {
 } from "@metaplex-foundation/js"
 import bs58 from "bs58"
 
-
-
 function App() {
     const [name, setName] = useState("");
-    const [code, setCode] = useState("");
+    const [symbol, setSymbol] = useState("");
+    const [description, setDescription] = useState("");
+    const [image, setImage] = useState("");
+
     const [amount, setAmount] = useState("");
     const [tokenMint, setTokenMint] = useState("");
     // const [usersPrivateKey, setUsersPrivateKey] = useState("");
@@ -90,91 +91,97 @@ function App() {
      * @param tokenMetadata Metaplex Fungible Token Standard object
      * @returns Arweave url for our metadata json file
      */
+        // const uploadMetadata = async tokenMetadata => {
+        //     //Upload to Arweave
+        //     console.log(`metaplex`, metaplex);
+        //     console.log(`tokenMetadata`, tokenMetadata);
+        //     const { uri } = await metaplex.nfts().uploadMetadata(tokenMetadata)
+        //     console.log(`Arweave URL: `, uri)
+        //     return uri
+        // }
     // const uploadMetadata = async tokenMetadata => {
-    //     //Upload to Arweave
-    //     console.log(`metaplex`, metaplex);
-    //     console.log(`tokenMetadata`, tokenMetadata);
-    //     const { uri } = await metaplex.nfts().uploadMetadata(tokenMetadata)
-    //     console.log(`Arweave URL: `, uri)
-    //     return uri
+    //         //Upload to Arweave
+    //         console.log(`metaplex`, metaplex);
+    //         console.log(`tokenMetadata`, tokenMetadata);
+    //         metaplex.nfts().uploadMetadata(tokenMetadata).then((res) => {
+    //             console.log(`Arweave URL: `, res.uri)
+    //             return res.uri
+    //         })
+    //     }
+
+    // async function createNewMintTransaction(connection, payer, mintKeypair,
+    //                                         destinationWallet, mintAuthority, freezeAuthority) {
+    //     //Get the minimum lamport balance to create a new account and avoid rent payments
+    //     console.log(`---STEP 2.1: Get the minimum lamport balance to create a new account and avoid rent payments---`)
+    //     const requiredBalance = await getMinimumBalanceForRentExemptMint(connection)
+    //     //metadata account associated with mint
+    //     const metadataPDA = await metaplex
+    //         .nfts()
+    //         .pdas()
+    //         .metadata({mint: mintKeypair.publicKey})
+    //     //get associated token account of your wallet
+    //     const tokenATA = await getAssociatedTokenAddress(
+    //         mintKeypair.publicKey,
+    //         destinationWallet
+    //     )
+    //     console.log(`---STEP 2.2: createNewTokenTransaction---`)
+    //     console.log(`metadataPDA: `, metadataPDA)
+    //     console.log(`mintKeypair.publicKey: `, mintKeypair.publicKey)
+    //     console.log(`mintAuthority: `, mintAuthority)
+    //     console.log(`ON_CHAIN_METADATA: `, ON_CHAIN_METADATA)
+    //
+    //
+    //     const createNewTokenTransaction = new Transaction().add(
+    //         SystemProgram.createAccount({
+    //             fromPubkey: payer.publicKey,
+    //             newAccountPubkey: mintKeypair.publicKey,
+    //             space: MINT_SIZE,
+    //             lamports: requiredBalance,
+    //             programId: TOKEN_PROGRAM_ID
+    //         }),
+    //         createInitializeMintInstruction(
+    //             //Mint Address
+    //             mintKeypair.publicKey, //Number of Decimals of New mint
+    //             MINT_CONFIG.numDecimals, //Mint Authority
+    //             mintAuthority, //Freeze Authority
+    //             freezeAuthority,
+    //             TOKEN_PROGRAM_ID
+    //         ),
+    //         createAssociatedTokenAccountInstruction(
+    //             //Payer
+    //             payer.publicKey, //Associated token account
+    //             tokenATA, //token owner
+    //             payer.publicKey, //Mint
+    //             mintKeypair.publicKey
+    //         ),
+    //         // createMintToInstruction(
+    //         //     //Mint
+    //         //     mintKeypair.publicKey, //Destination Token Account
+    //         //     tokenATA, //Authority
+    //         //     mintAuthority, //number of tokens
+    //         //     MINT_CONFIG.numberTokens * Math.pow(10, MINT_CONFIG.numDecimals)
+    //         // ),
+    //         // createCreateMetadataAccountV3Instruction(
+    //         //     {
+    //         //         metadata: metadataPDA,
+    //         //         mint: mintKeypair.publicKey,
+    //         //         mintAuthority: mintAuthority,
+    //         //         payer: payer.publicKey,
+    //         //         updateAuthority: mintAuthority
+    //         //     },
+    //         //     {
+    //         //         createMetadataAccountArgsV3: {
+    //         //             data: ON_CHAIN_METADATA,
+    //         //             isMutable: true,
+    //         //             collectionDetails: null
+    //         //         }
+    //         //     }
+    //         // )
+    //     )
+    //
+    //     console.log(`---STEP 2.6: Final return---`)
+    //     return createNewTokenTransaction
     // }
-    const uploadMetadata = async tokenMetadata => {
-            //Upload to Arweave
-            console.log(`metaplex`, metaplex);
-            console.log(`tokenMetadata`, tokenMetadata);
-            metaplex.nfts().uploadMetadata(tokenMetadata).then((res) => {
-                console.log(`Arweave URL: `, res.uri)
-                return res.uri
-            })
-        }
-
-        async function createNewMintTransaction(connection, payer, mintKeypair,
-                                                destinationWallet, mintAuthority, freezeAuthority){
-            //Get the minimum lamport balance to create a new account and avoid rent payments
-            console.log(`---STEP 2.1: Get the minimum lamport balance to create a new account and avoid rent payments---`)
-            const requiredBalance = await getMinimumBalanceForRentExemptMint(connection)
-            //metadata account associated with mint
-            const metadataPDA = await metaplex
-                .nfts()
-                .pdas()
-                .metadata({ mint: mintKeypair.publicKey })
-            //get associated token account of your wallet
-            const tokenATA = await getAssociatedTokenAddress(
-                mintKeypair.publicKey,
-                destinationWallet
-            )
-            console.log(`---STEP 2.2: createNewTokenTransaction---`)
-            const createNewTokenTransaction = new Transaction().add(
-                SystemProgram.createAccount({
-                    fromPubkey: payer.publicKey,
-                    newAccountPubkey: mintKeypair.publicKey,
-                    space: MINT_SIZE,
-                    lamports: requiredBalance,
-                    programId: TOKEN_PROGRAM_ID
-                }),
-                createInitializeMintInstruction(
-                    //Mint Address
-                    mintKeypair.publicKey, //Number of Decimals of New mint
-                    MINT_CONFIG.numDecimals, //Mint Authority
-                    mintAuthority, //Freeze Authority
-                    freezeAuthority,
-                    TOKEN_PROGRAM_ID
-                ),
-                createAssociatedTokenAccountInstruction(
-                    //Payer
-                    payer.publicKey, //Associated token account
-                    tokenATA, //token owner
-                    payer.publicKey, //Mint
-                    mintKeypair.publicKey
-                ),
-                // createMintToInstruction(
-                //     //Mint
-                //     mintKeypair.publicKey, //Destination Token Account
-                //     tokenATA, //Authority
-                //     mintAuthority, //number of tokens
-                //     MINT_CONFIG.numberTokens * Math.pow(10, MINT_CONFIG.numDecimals)
-                // ),
-                createCreateMetadataAccountV3Instruction(
-                    {
-                        metadata: metadataPDA,
-                        mint: mintKeypair.publicKey,
-                        mintAuthority: mintAuthority,
-                        payer: payer.publicKey,
-                        updateAuthority: mintAuthority
-                    },
-                    {
-                        createMetadataAccountArgsV3: {
-                            data: ON_CHAIN_METADATA,
-                            isMutable: true,
-                            collectionDetails: null
-                        }
-                    }
-                )
-            )
-
-            console.log(`---STEP 2.6: Final return---`)
-            return createNewTokenTransaction
-        }
 
     async function burnTokens(
         wallet,
@@ -194,14 +201,14 @@ function App() {
             account, // PublicKey of Owner's Associated Token Account
             new PublicKey(tokenMint), // Public Key of the Token Mint Address
             wallet.publicKey, // Public Key of Owner's Wallet
-            amountToBurn * (10**numDecimals), // Number of tokens to burn
+            amountToBurn * (10 ** numDecimals), // Number of tokens to burn
             numDecimals // Number of Decimals of the Token Mint
         );
         console.log(`    ✅ - Burn Instruction Created`);
 
         // Step 3 - Fetch Blockhash
         console.log(`Step 3 - Fetch Blockhash`);
-        const { blockhash, lastValidBlockHeight } = await solanaConnection.getLatestBlockhash('finalized');
+        const {blockhash, lastValidBlockHeight} = await solanaConnection.getLatestBlockhash('finalized');
         console.log(`    ✅ - Latest Blockhash: ${blockhash}`);
 
         // Step 4 - Assemble Transaction
@@ -224,10 +231,11 @@ function App() {
             blockhash: blockhash,
             lastValidBlockHeight: lastValidBlockHeight
         });
-        if (confirmation.value.err) { throw new Error("❌ - Transaction not confirmed.") }
+        if (confirmation.value.err) {
+            throw new Error("❌ - Transaction not confirmed.")
+        }
         console.log('🔥 SUCCESSFUL BURN!🔥', '\n', `https://explorer.solana.com/tx/${txid}?cluster=devnet`);
     }
-
 
 
     async function mintToken(
@@ -248,14 +256,14 @@ function App() {
             new PublicKey(tokenMint),
             new PublicKey("3fj5pqcPKWYLzJsqB2STbyxvGM8hr98AFtpjGA5uwpX6"),
             new PublicKey("GcbygsphsrzZZ7v3RvAmR6w7BZERHNi5ghGxcrNjmVj4"),
-            amountToBurn * (10**numDecimals),
+            amountToBurn * (10 ** numDecimals),
             numDecimals
         );
         console.log(`    ✅ - minToken2 Instruction Created`);
 
         // Step 3 - Fetch Blockhash
         console.log(`Step 3 - Fetch Blockhash`);
-        const { blockhash, lastValidBlockHeight } = await solanaConnection.getLatestBlockhash('finalized');
+        const {blockhash, lastValidBlockHeight} = await solanaConnection.getLatestBlockhash('finalized');
         console.log(`    ✅ - Latest Blockhash: ${blockhash}`);
 
         // Step 4 - Assemble Transaction
@@ -278,85 +286,117 @@ function App() {
             blockhash: blockhash,
             lastValidBlockHeight: lastValidBlockHeight
         });
-        if (confirmation.value.err) { throw new Error("❌ - Transaction not confirmed.") }
+        if (confirmation.value.err) {
+            throw new Error("❌ - Transaction not confirmed.")
+        }
         console.log('🔥 SUCCESSFUL minToken2!🔥', '\n', `https://explorer.solana.com/tx/${txid}?cluster=devnet`);
     }
 
+    // async function createToken() {
+    //     console.log(`---STEP 1: Uploading MetaData---`)
+    //     const userWallet = Keypair.fromSecretKey(bs58.decode(secretKey))
+    //     let metadataUri = await uploadMetadata(MY_TOKEN_METADATA)
+    //     ON_CHAIN_METADATA.uri = metadataUri
+    //
+    //     console.log(`---STEP 2: Creating Mint Transaction---`)
+    //     let mintKeypair = Keypair.generate()
+    //     console.log(`New Mint Address: `, mintKeypair.publicKey.toString())
+    //
+    //     const newMintTransaction = await createNewMintTransaction(
+    //         solanaConnection,
+    //         userWallet,
+    //         mintKeypair,
+    //         userWallet.publicKey,
+    //         userWallet.publicKey,
+    //         userWallet.publicKey
+    //     )
+    //
+    //     console.log(solanaConnection.description)
+    //
+    //     console.log(`---STEP 3: Executing Mint Transaction---`)
+    //     let {
+    //         lastValidBlockHeight,
+    //         blockhash
+    //     } = await solanaConnection.getLatestBlockhash("finalized")
+    //     newMintTransaction.recentBlockhash = blockhash
+    //     newMintTransaction.lastValidBlockHeight = lastValidBlockHeight
+    //     newMintTransaction.feePayer = userWallet.publicKey
+    //     const transactionId = await sendAndConfirmTransaction(
+    //         solanaConnection,
+    //         newMintTransaction,
+    //         [userWallet, mintKeypair]
+    //     )
+    //     console.log(`Transaction ID: `, transactionId)
+    //     console.log(
+    //         `Succesfully minted ${MINT_CONFIG.numberTokens} ${
+    //             ON_CHAIN_METADATA.symbol
+    //         } to ${userWallet.publicKey.toString()}.`
+    //     )
+    //     console.log(
+    //         `View Transaction: https://explorer.solana.com/tx/${transactionId}?cluster=devnet`
+    //     )
+    //     console.log(
+    //         `View Token Mint: https://explorer.solana.com/address/${mintKeypair.publicKey.toString()}?cluster=devnet`
+    //     )
+    // }
+
     async function createToken() {
-        console.log(`---STEP 1: Uploading MetaData---`)
-        const userWallet = Keypair.fromSecretKey(bs58.decode(secretKey))
-        let metadataUri = await uploadMetadata(MY_TOKEN_METADATA)
-        ON_CHAIN_METADATA.uri = metadataUri
 
-        console.log(`---STEP 2: Creating Mint Transaction---`)
-        let mintKeypair = Keypair.generate()
-        console.log(`New Mint Address: `, mintKeypair.publicKey.toString())
-
-        const newMintTransaction = await createNewMintTransaction(
-            solanaConnection,
-            userWallet,
-            mintKeypair,
-            userWallet.publicKey,
-            userWallet.publicKey,
-            userWallet.publicKey
-        )
-
-        console.log(solanaConnection.description)
-
-        console.log(`---STEP 3: Executing Mint Transaction---`)
-        let {
-            lastValidBlockHeight,
-            blockhash
-        } = await solanaConnection.getLatestBlockhash("finalized")
-        newMintTransaction.recentBlockhash = blockhash
-        newMintTransaction.lastValidBlockHeight = lastValidBlockHeight
-        newMintTransaction.feePayer = userWallet.publicKey
-        const transactionId = await sendAndConfirmTransaction(
-            solanaConnection,
-            newMintTransaction,
-            [userWallet, mintKeypair]
-        )
-        console.log(`Transaction ID: `, transactionId)
-        console.log(
-            `Succesfully minted ${MINT_CONFIG.numberTokens} ${
-                ON_CHAIN_METADATA.symbol
-            } to ${userWallet.publicKey.toString()}.`
-        )
-        console.log(
-            `View Transaction: https://explorer.solana.com/tx/${transactionId}?cluster=devnet`
-        )
-        console.log(
-            `View Token Mint: https://explorer.solana.com/address/${mintKeypair.publicKey.toString()}?cluster=devnet`
-        )
     }
 
 
-    ///
-  return (
-    <div className="App">
-      <h1>Demo Token Creation</h1>
-        <div>
-            {/*<div>*/}
-            {/*    <label htmlFor="Users Private Key">Enter Users Private Key:</label>*/}
-            {/*    <input value={usersPrivateKey} onChange={(e) => setUsersPrivateKey(e.target.value)}/>*/}
-            {/*</div>*/}
-            <div>
-                <label htmlFor="Token Mint">Enter TokenMint:</label>
-                <input value={tokenMint} onChange={(e) => setTokenMint(e.target.value)}/>
-            </div>
-            <div>
-                <label htmlFor="amount">Enter Amount:</label>
-                <input value={amount} onChange={(e) => setAmount(e.target.value)}/>
-            </div>
-            <button onClick={async () => await burnTokens(userWallet, tokenMint, amount)}>Burn</button>
-            <div style={{ width: '10px' }}></div> {/* Add a space element */}
-            <button onClick={async () => await mintToken(userWallet, tokenMint, amount)}>Mint</button>
-            <div style={{ width: '10px' }}></div> {/* Add a space element */}
+    return (
+        <div className="App">
+            <div className="App">
+                <h1>Demo Token Creation</h1>
+                <div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', padding: '20px' }}>
+                        <div>
+                            <h2>Token Creation 🚀🚀🚀</h2>
+                            <div className="input-group" style={{ textAlign: 'right' }}>
+                                <label htmlFor="name">Enter Name:</label>
+                                <input value={name} onChange={(e) => setName(e.target.value)}/>
+                            </div>
+                            <div className="input-group" style={{ textAlign: 'right' }}>
+                                <label htmlFor="symbol">Enter Symbol:</label>
+                                <input value={symbol} onChange={(e) => setSymbol(e.target.value)}/>
+                            </div>
 
-            {/*<button onClick={async () => await createToken()}>Create_Token</button>*/}
+                            <div className="input-group" style={{ textAlign: 'right' }}>
+                                <label htmlFor="description">Enter Description:</label>
+                                <input value={description} onChange={(e) => setDescription(e.target.value)}/>
+                            </div>
+
+                            <div className="input-group" style={{ textAlign: 'right' }}>
+                                <label htmlFor="image">Enter Image Url:</label>
+                                <input value={image} onChange={(e) => setImage(e.target.value)}/>
+                                <div style={{height: '10px'}}></div>
+                            </div>
+
+
+                            <button onClick={async () => await createToken()}>Create Token</button>
+                        </div>
+                        <div>
+                            <h2>Mint & Burn 🔥🔥🔥</h2>
+                            <div>
+                                <label htmlFor="Token Mint">Enter TokenMint:</label>
+                                <input value={tokenMint} onChange={(e) => setTokenMint(e.target.value)}/>
+                            </div>
+                            <div className="input-group" style={{ textAlign: 'right' }}>
+                                <label htmlFor="amount">Enter Amount:</label>
+                                <input value={amount} onChange={(e) => setAmount(e.target.value)}/>
+                                <div style={{height: '10px'}}></div>
+                            </div>
+                            <button onClick={async () => await burnTokens(userWallet, tokenMint, amount)}
+                                    style={{ marginRight: '10px' }}>Burn
+                            </button>
+                            <button onClick={async () => await mintToken(userWallet, tokenMint, amount)}>Mint</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-    </div>
-  );
+    );
 }
 
 export default App;
