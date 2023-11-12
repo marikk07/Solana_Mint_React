@@ -31,6 +31,9 @@ import {
 } from "@metaplex-foundation/js"
 import bs58 from "bs58"
 
+const axios = require('axios');
+const apiUrl = 'http://localhost:3000/api/example';
+
 function App() {
     const [name, setName] = useState("");
     const [symbol, setSymbol] = useState("");
@@ -341,7 +344,19 @@ function App() {
     // }
 
     async function createToken() {
+        const data = {
+            tokenName: name,
+            tokenSymbol: symbol,
+            description: description,
+            imageUrl: image
+        };
 
+        try {
+            const response = await axios.post(apiUrl, data);
+            console.log('Token creation successful:', response.data);
+        } catch (error) {
+            console.error('Error creating the token:', error);
+        }
     }
 
 
