@@ -32,13 +32,16 @@ import {
 import bs58 from "bs58"
 
 const axios = require('axios');
-const apiUrl = 'https://solana-backend-844f8683e25f.herokuapp.com/api/createToken';
+const apiUrl = 'http://localhost:3000/api/createToken';
+//'https://solana-backend-844f8683e25f.herokuapp.com/api/createToken';
 
 function App() {
     const [name, setName] = useState("");
     const [symbol, setSymbol] = useState("");
     const [description, setDescription] = useState("");
     const [image, setImage] = useState("");
+    const [numDecimals, setDecimals] = useState(9);
+
 
     const [amount, setAmount] = useState("");
     const [tokenMint, setTokenMint] = useState("");
@@ -51,7 +54,6 @@ function App() {
     const secretKey =
         "5PSAw83j32BC4MP95Vkrc7SgbezQw6h6Z68ekrUphBzexXaedzgB5XBHx7Ghvp6WZMxZ6BUAqPi1zkXxCjVoDF3k"
 
-    const numDecimals = 6
 
     const userWallet = Keypair.fromSecretKey(bs58.decode(secretKey))
     const metaplex = Metaplex.make(solanaConnection)
@@ -64,10 +66,6 @@ function App() {
             })
         )
 
-    const MINT_CONFIG = {
-        numDecimals: numDecimals,
-        numberTokens: 100
-    }
     const MY_TOKEN_METADATA = {
         name: "My New Token",
         symbol: "MkkT",
@@ -159,11 +157,12 @@ function App() {
         console.log(`Step 2 - Create minToken2 Instructions`);
         const burnIx = createMintToCheckedInstruction(
             new PublicKey(tokenMint),
-            new PublicKey("3fj5pqcPKWYLzJsqB2STbyxvGM8hr98AFtpjGA5uwpX6"),
-            new PublicKey("GcbygsphsrzZZ7v3RvAmR6w7BZERHNi5ghGxcrNjmVj4"),
+            account,
+            wallet.publicKey,
             amountToBurn * (10 ** numDecimals),
             numDecimals
         );
+
         console.log(`    ✅ - minToken2 Instruction Created`);
 
         // Step 3 - Fetch Blockhash
@@ -203,8 +202,18 @@ function App() {
             tokenName: name,
             tokenSymbol: symbol,
             description: description,
-            imageUrl: image
+            imageUrl: image,
+            decimals: numDecimals
         };
+
+        console.log(`Token Name: ${data.tokenName}`);
+
+        // try {
+        //     const response = await axios.post(apiUrl, data);
+        //     console.log('Token creation successful:', response.data);
+        // } catch (error) {
+        //     console.error('Error creating the token:', error);
+        // }
 
         const options = {
             method: 'POST',
@@ -254,6 +263,11 @@ function App() {
                             <div className="input-group" style={{ textAlign: 'right' }}>
                                 <label htmlFor="image">Enter Image Url:</label>
                                 <input value={image} onChange={(e) => setImage(e.target.value)}/>
+                            </div>
+
+                            <div className="input-group" style={{ textAlign: 'right' }}>
+                                <label htmlFor="numDecimals">Set Decimals:</label>
+                                <input value={numDecimals} onChange={(e) => setDecimals(e.target.value)}/>
                                 <div style={{height: '10px'}}></div>
                             </div>
 
