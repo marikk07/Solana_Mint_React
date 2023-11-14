@@ -41,6 +41,8 @@ function App() {
     const [description, setDescription] = useState("");
     const [image, setImage] = useState("");
     const [numDecimals, setDecimals] = useState(9);
+    const [tokensAmount, setTokensAmount] = useState(1000);
+
 
 
     const [amount, setAmount] = useState("");
@@ -203,7 +205,8 @@ function App() {
             tokenSymbol: symbol,
             description: description,
             imageUrl: image,
-            decimals: numDecimals
+            decimals: numDecimals,
+            numberOfTokens: tokensAmount
         };
 
         console.log(`Token Name: ${data.tokenName}`);
@@ -268,6 +271,11 @@ function App() {
                             <div className="input-group" style={{ textAlign: 'right' }}>
                                 <label htmlFor="numDecimals">Set Decimals:</label>
                                 <input value={numDecimals} onChange={(e) => setDecimals(e.target.value)}/>
+                            </div>
+
+                            <div className="input-group" style={{ textAlign: 'right' }}>
+                                <label htmlFor="numDecimals">Set Tokens Amount:</label>
+                                <input value={tokensAmount} onChange={(e) => setTokensAmount(e.target.value)}/>
                                 <div style={{height: '10px'}}></div>
                             </div>
 
