@@ -32,8 +32,7 @@ import {
 import bs58 from "bs58"
 
 const axios = require('axios');
-const apiUrl = 'http://localhost:3000/api/createToken';
-//'https://solana-backend-844f8683e25f.herokuapp.com/api/createToken';
+const apiUrl = 'https://solana-backend-844f8683e25f.herokuapp.com/api/createToken';
 
 function App() {
     const [name, setName] = useState("");
