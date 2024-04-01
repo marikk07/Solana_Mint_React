@@ -17,7 +17,7 @@ function App() {
                         <li><Link to="/MintBurn">MintBurn</Link></li>
                         <li><Link to="/Delegate">Delegate</Link></li>
                         <li><Link to="/Freeze">Freeze</Link></li>
-                        <li><Link to="/Send">Send</Link></li>
+                        {/*<li><Link to="/Send">Send</Link></li>*/}
                     </ul>
                 </nav>
 
@@ -27,7 +27,7 @@ function App() {
                     <Route path="/MintBurn" element={<MintBurn />} />
                     <Route path="/Delegate" element={<Delegate />} />
                     <Route path="/Freeze" element={<Freeze />} />
-                    <Route path="/Send" element={<Send />} />
+                    {/*<Route path="/Send" element={<Send />} />*/}
                 </Routes>
             </div>
         </Router>

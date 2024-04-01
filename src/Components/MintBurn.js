@@ -4,73 +4,97 @@ import {
     getAssociatedTokenAddress
 } from "@solana/spl-token";
 import {clusterApiUrl, Connection, Keypair, PublicKey, TransactionMessage, VersionedTransaction} from "@solana/web3.js";
-import {useState} from "react";
+import React, {useEffect, useState} from "react";
 import bs58 from "bs58";
-
+import {userWallet, solanaConnection} from "../Constants";
+import axios from "axios";
 
 function MintBurn() {
-    const endpoint =
-        "https://aged-few-gas.solana-devnet.quiknode.pro/709859f8e8b4d80991023ddd417b320d0e139e84/" //Replace with your RPC Endpoint
-    const solanaConnection = new Connection(clusterApiUrl("devnet")) //new Connection(endpoint);
-    const secretKey =
-        "5PSAw83j32BC4MP95Vkrc7SgbezQw6h6Z68ekrUphBzexXaedzgB5XBHx7Ghvp6WZMxZ6BUAqPi1zkXxCjVoDF3k"
-    const userWallet = Keypair.fromSecretKey(bs58.decode(secretKey))
-
+    const [tokens, setTokens] = useState([]);
     const [numDecimals, setDecimals] = useState(9);
     const [amount, setAmount] = useState("");
     const [tokenMint, setTokenMint] = useState("");
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState('');
+    const [feedback, setFeedback] = useState('');
+
+    const mintApiUrl = 'http://localhost:3000/api/mint';
+    const burnApiUrl = 'http://localhost:3000/api/burn';
+
+
+    useEffect(() => {
+        // Replace 'http://localhost:3000' with the actual base URL of your API
+        const apiUrl = `http://localhost:3000/api/tokenDetails`;
+
+        fetch(apiUrl)
+            .then((response) => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then((data) => {
+                setTokens(data);
+                if (data.length > 0) {
+                    setTokenMint(data[0].tokenMint); // Automatically select the first token mint address
+                }
+                setIsLoading(false);
+            })
+            .catch((error) => {
+                console.error('Error fetching data:', error);
+                setError('Failed to fetch token data.');
+                setIsLoading(false);
+            });
+    }, []);
+
+    if (isLoading) {
+        return <div>Loading...</div>;
+    }
+
+    if (error) {
+        return <div>Error: {error}</div>;
+    }
+
+
+
+
     async function burnTokens(
         wallet,
         tokenMint, // The mint associated with the token
         amountToBurn // The number of tokens to burn
     ) {
         console.log(`Attempting to burn ${amountToBurn} [${tokenMint}] tokens from Owner Wallet: ${wallet.publicKey.toString()}`);
+        const data = {
+            tokenMint: tokenMint,
+            amountToBurn: amountToBurn
+        };
 
-        // Step 1 - Fetch Associated Token Account Address
-        console.log(`Step 1 - Fetch Token Account`);
-        const account = await getAssociatedTokenAddress(new PublicKey(tokenMint), wallet.publicKey);
-        console.log(`    ✅ - Associated Token Account Address: ${account.toString()}`);
+        const options = {
+            method: 'POST',
+            url: burnApiUrl,
+            params: { 'api-version': '3.0' },
+            headers: {
+                'content-type': 'application/json',
+                'X-RapidAPI-Key': 'your-rapidapi-key',
+                'X-RapidAPI-Host': 'microsoft-translator-text.p.rapidapi.com',
+            },
+            data: data
+        };
 
-        // Step 2 - Create Burn Instructions
-        console.log(`Step 2 - Create Burn Instructions`);
-        const burnIx = createBurnCheckedInstruction(
-            account, // PublicKey of Owner's Associated Token Account
-            new PublicKey(tokenMint), // Public Key of the Token Mint Address
-            wallet.publicKey, // Public Key of Owner's Wallet
-            amountToBurn * (10 ** numDecimals), // Number of tokens to burn
-            numDecimals // Number of Decimals of the Token Mint
-        );
-        console.log(`    ✅ - Burn Instruction Created`);
-
-        // Step 3 - Fetch Blockhash
-        console.log(`Step 3 - Fetch Blockhash`);
-        const {blockhash, lastValidBlockHeight} = await solanaConnection.getLatestBlockhash('finalized');
-        console.log(`    ✅ - Latest Blockhash: ${blockhash}`);
-
-        // Step 4 - Assemble Transaction
-        console.log(`Step 4 - Assemble Transaction`);
-        const messageV0 = new TransactionMessage({
-            payerKey: wallet.publicKey,
-            recentBlockhash: blockhash,
-            instructions: [burnIx]
-        }).compileToV0Message();
-        const transaction = new VersionedTransaction(messageV0);
-        transaction.sign([wallet]);
-        console.log(`    ✅ - Transaction Created and Signed`);
-
-        // Step 5 - Execute & Confirm Transaction
-        console.log(`Step 5 - Execute & Confirm Transaction`);
-        const txid = await solanaConnection.sendTransaction(transaction);
-        console.log("    ✅ - Transaction sent to network");
-        const confirmation = await solanaConnection.confirmTransaction({
-            signature: txid,
-            blockhash: blockhash,
-            lastValidBlockHeight: lastValidBlockHeight
-        });
-        if (confirmation.value.err) {
-            throw new Error("❌ - Transaction not confirmed.")
-        }
-        console.log('🔥 SUCCESSFUL BURN!🔥', '\n', `https://explorer.solana.com/tx/${txid}?cluster=devnet`);
+        axios
+            .request(options)
+            .then(function (response) {
+                console.log(response.data);
+                const message = `${response.data.message}`;
+                setFeedback(message);
+            })
+            .catch(function (error) {
+                console.error(error);
+                setFeedback(`Error: ${error.response?.data?.error || error.message}`);
+            })
+            .finally(() => {
+                setIsLoading(false);
+            });
     }
 
     async function mintToken(
@@ -78,74 +102,89 @@ function MintBurn() {
         tokenMint, // The mint associated with the token
         amountToBurn // The number of tokens to burn
     ) {
-        console.log(`Attempting to minToken2 ${amountToBurn} [${tokenMint}] tokens from Owner Wallet: ${wallet.publicKey.toString()}`);
+        console.log(`Attempting to minToken ${amountToBurn} [${tokenMint}] tokens from Owner Wallet: ${wallet.publicKey.toString()}`);
 
-        // Step 1 - Fetch Associated Token Account Address
-        console.log(`Step 1 - Fetch Token Account`);
-        const account = await getAssociatedTokenAddress(new PublicKey(tokenMint), wallet.publicKey);
-        console.log(`    ✅ - Associated Token Account Address: ${account.toString()}`);
+        const data = {
+            tokenMint: tokenMint,
+            amountToBurn: amountToBurn
+        };
 
-        // Step 2 - Create Burn Instructions
-        console.log(`Step 2 - Create minToken2 Instructions`);
-        const burnIx = createMintToCheckedInstruction(
-            new PublicKey(tokenMint),
-            account,
-            wallet.publicKey,
-            amountToBurn * (10 ** numDecimals),
-            numDecimals
-        );
+        const options = {
+            method: 'POST',
+            url: mintApiUrl,
+            params: { 'api-version': '3.0' },
+            headers: {
+                'content-type': 'application/json',
+                'X-RapidAPI-Key': 'your-rapidapi-key',
+                'X-RapidAPI-Host': 'microsoft-translator-text.p.rapidapi.com',
+            },
+            data: data
+        };
 
-        console.log(`    ✅ - minToken2 Instruction Created`);
-
-        // Step 3 - Fetch Blockhash
-        console.log(`Step 3 - Fetch Blockhash`);
-        const {blockhash, lastValidBlockHeight} = await solanaConnection.getLatestBlockhash('finalized');
-        console.log(`    ✅ - Latest Blockhash: ${blockhash}`);
-
-        // Step 4 - Assemble Transaction
-        console.log(`Step 4 - Assemble Transaction`);
-        const messageV0 = new TransactionMessage({
-            payerKey: wallet.publicKey,
-            recentBlockhash: blockhash,
-            instructions: [burnIx]
-        }).compileToV0Message();
-        const transaction = new VersionedTransaction(messageV0);
-        transaction.sign([wallet]);
-        console.log(`    ✅ - Transaction Created and Signed`);
-
-        // Step 5 - Execute & Confirm Transaction
-        console.log(`Step 5 - Execute & Confirm Transaction`);
-        const txid = await solanaConnection.sendTransaction(transaction);
-        console.log("    ✅ - Transaction sent to network");
-        const confirmation = await solanaConnection.confirmTransaction({
-            signature: txid,
-            blockhash: blockhash,
-            lastValidBlockHeight: lastValidBlockHeight
-        });
-        if (confirmation.value.err) {
-            throw new Error("❌ - Transaction not confirmed.")
-        }
-        console.log('🔥 SUCCESSFUL minToken2!🔥', '\n', `https://explorer.solana.com/tx/${txid}?cluster=devnet`);
+        axios
+            .request(options)
+            .then(function (response) {
+                console.log(response.data);
+                const message = ` ${response.data.message}`;
+                setFeedback(message);
+            })
+            .catch(function (error) {
+                console.error(error);
+                setFeedback(`Error: ${error.response?.data?.error || error.message}`);
+            })
+            .finally(() => {
+                setIsLoading(false);
+            });
     }
 
     return (
-    <div>
-        <h2>Mint & Burn 🔥🔥🔥</h2>
         <div>
-            <label htmlFor="Token Mint">Enter TokenMint:</label>
-            <input value={tokenMint} onChange={(e) => setTokenMint(e.target.value)}/>
+            <h2>Mint & Burn 🔥🔥🔥</h2>
+            <div>
+                <label htmlFor="tokenSelect">Select Token:</label>
+                <select
+                    id="tokenSelect"
+                    onChange={(e) => setTokenMint(e.target.value)}
+                >
+                    {tokens.map((token) => (
+                        <option key={token.mint} value={token.mint}>
+                            {token.tokenSymbol}
+                        </option>
+                    ))}
+                </select>
+            </div>
+            <div>
+                <label htmlFor="Token Mint">Token Mint Address:</label>
+                <input
+                    id="Token Mint"
+                    value={tokenMint}
+                    onChange={(e) => setTokenMint(e.target.value)}
+                />
+            </div>
+            <div className="input-group" style={{textAlign: 'right'}}>
+                <label htmlFor="amount">Enter Amount:</label>
+                <input
+                    id="amount"
+                    value={amount}
+                    onChange={(e) => setAmount(e.target.value)}
+                />
+                <div style={{height: '10px'}}></div>
+            </div>
+            <button
+                onClick={async () => await burnTokens(userWallet, tokenMint, amount)}
+                style={{marginRight: '10px'}}
+            >
+                Burn
+            </button>
+            <button onClick={async () => await mintToken(userWallet, tokenMint, amount)}>
+                Mint
+            </button>
+
+            <div className={feedback.startsWith("Error") ? "error-feedback" : "success-feedback"}>
+                {feedback}
+            </div>
         </div>
-        <div className="input-group" style={{textAlign: 'right'}}>
-            <label htmlFor="amount">Enter Amount:</label>
-            <input value={amount} onChange={(e) => setAmount(e.target.value)}/>
-            <div style={{height: '10px'}}></div>
-        </div>
-        <button onClick={async () => await burnTokens(userWallet, tokenMint, amount)}
-                style={{marginRight: '10px'}}>Burn
-        </button>
-        <button onClick={async () => await mintToken(userWallet, tokenMint, amount)}>Mint
-        </button>
-    </div> );
+    );
 }
 
 export default MintBurn;
