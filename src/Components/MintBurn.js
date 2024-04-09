@@ -17,15 +17,17 @@ function MintBurn() {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState('');
     const [feedback, setFeedback] = useState('');
+    const [showDelegates, setShowDelegates] = useState(false);
+    const [delegates, setDelegates] = useState([]);
+
 
     const mintApiUrl = 'http://localhost:3000/api/mint';
     const burnApiUrl = 'http://localhost:3000/api/burn';
-
+    const apiUrl = `http://localhost:3000/api/tokenDetails`;
+    const fetchDelegatesApiUrl = 'http://localhost:3000/api/delegates';
 
     useEffect(() => {
-        // Replace 'http://localhost:3000' with the actual base URL of your API
-        const apiUrl = `http://localhost:3000/api/tokenDetails`;
-
+        fetchDelegates();
         fetch(apiUrl)
             .then((response) => {
                 if (!response.ok) {
@@ -55,6 +57,23 @@ function MintBurn() {
         return <div>Error: {error}</div>;
     }
 
+
+    const toggleDelegatesVisibility = () => {
+        setShowDelegates(!showDelegates);
+    };
+
+    async function fetchDelegates() {
+        setIsLoading(true);
+        try {
+            const response = await axios.get(fetchDelegatesApiUrl);
+            setDelegates(response.data.delegates); // You need to add a useState for delegates
+        } catch (error) {
+            console.error('Error fetching delegates:', error);
+            setFeedback(`Error fetching delegates: ${error.response?.data?.error || error.message}`);
+        } finally {
+            setIsLoading(false);
+        }
+    }
 
 
 
@@ -140,6 +159,23 @@ function MintBurn() {
     return (
         <div>
             <h2>Mint & Burn 🔥🔥🔥</h2>
+            <button onClick={toggleDelegatesVisibility}>
+                {showDelegates ? 'Use Main Key' : 'Use Delegate Key'}
+            </button>
+
+            {showDelegates && (
+                <div>
+                    <label htmlFor="delegateSelect">Select Delegate:</label>
+                    <select id="delegateSelect" onChange={(e) => setDelegates(e.target.value)}>
+                        {delegates.map((delegate) => (
+                            <option key={delegate.id} value={delegate.public_key}>
+                                {delegate.public_key}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+            )}
+
             <div>
                 <label htmlFor="tokenSelect">Select Token:</label>
                 <select
@@ -148,7 +184,7 @@ function MintBurn() {
                 >
                     {tokens.map((token) => (
                         <option key={token.mint} value={token.mint}>
-                            {token.tokenSymbol}
+                            {token.symbol}
                         </option>
                     ))}
                 </select>
@@ -176,9 +212,12 @@ function MintBurn() {
             >
                 Burn
             </button>
-            <button onClick={async () => await mintToken(userWallet, tokenMint, amount)}>
-                Mint
-            </button>
+            {/* Conditionally render the Mint button */}
+            {!showDelegates && (
+                <button onClick={async () => await mintToken(userWallet, tokenMint, amount)}>
+                    Mint
+                </button>
+            )}
 
             <div className={feedback.startsWith("Error") ? "error-feedback" : "success-feedback"}>
                 {feedback}
