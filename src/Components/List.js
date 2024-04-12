@@ -77,7 +77,7 @@ function List() {
                             )}
                         </td>
                         <td>{token.name}</td>
-                        <td>{token.balance}</td> {/* Adjusted from amount to balance based on previous examples */}
+                        <td>{token.amount}</td> {/* Adjusted from amount to balance based on previous examples */}
                         <td>{token.mint}</td>
                     </tr>
                 ))}

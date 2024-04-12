@@ -6,7 +6,7 @@ import {
 import {clusterApiUrl, Connection, Keypair, PublicKey, TransactionMessage, VersionedTransaction} from "@solana/web3.js";
 import React, {useEffect, useState} from "react";
 import bs58 from "bs58";
-import {userWallet, solanaConnection} from "../Constants";
+// import {userWallet, solanaConnection} from "../Constants";
 import axios from "axios";
 
 function MintBurn() {
@@ -78,11 +78,10 @@ function MintBurn() {
 
 
     async function burnTokens(
-        wallet,
         tokenMint, // The mint associated with the token
         amountToBurn // The number of tokens to burn
     ) {
-        console.log(`Attempting to burn ${amountToBurn} [${tokenMint}] tokens from Owner Wallet: ${wallet.publicKey.toString()}`);
+        console.log(`Attempting to burn ${amountToBurn} [${tokenMint}] tokens from Owner Wallet}`);
         const data = {
             tokenMint: tokenMint,
             amountToBurn: amountToBurn
@@ -117,11 +116,10 @@ function MintBurn() {
     }
 
     async function mintToken(
-        wallet,
         tokenMint, // The mint associated with the token
         amountToBurn // The number of tokens to burn
     ) {
-        console.log(`Attempting to minToken ${amountToBurn} [${tokenMint}] tokens from Owner Wallet: ${wallet.publicKey.toString()}`);
+        console.log(`Attempting to minToken ${amountToBurn} [${tokenMint}] tokens from Owner Wallet}`);
 
         const data = {
             tokenMint: tokenMint,
@@ -207,14 +205,14 @@ function MintBurn() {
                 <div style={{height: '10px'}}></div>
             </div>
             <button
-                onClick={async () => await burnTokens(userWallet, tokenMint, amount)}
+                onClick={async () => await burnTokens(tokenMint, amount)}
                 style={{marginRight: '10px'}}
             >
                 Burn
             </button>
             {/* Conditionally render the Mint button */}
             {!showDelegates && (
-                <button onClick={async () => await mintToken(userWallet, tokenMint, amount)}>
+                <button onClick={async () => await mintToken(tokenMint, amount)}>
                     Mint
                 </button>
             )}
