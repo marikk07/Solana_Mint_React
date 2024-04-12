@@ -1,13 +1,7 @@
-import {
-    createBurnCheckedInstruction,
-    createMintToCheckedInstruction,
-    getAssociatedTokenAddress
-} from "@solana/spl-token";
-import {clusterApiUrl, Connection, Keypair, PublicKey, TransactionMessage, VersionedTransaction} from "@solana/web3.js";
+
 import React, {useEffect, useState} from "react";
-import bs58 from "bs58";
-// import {userWallet, solanaConnection} from "../Constants";
 import axios from "axios";
+import { BASE_URL } from '../Constants';
 
 function MintBurn() {
     const [tokens, setTokens] = useState([]);
@@ -21,10 +15,10 @@ function MintBurn() {
     const [delegates, setDelegates] = useState([]);
 
 
-    const mintApiUrl = 'http://localhost:3000/api/mint';
-    const burnApiUrl = 'http://localhost:3000/api/burn';
-    const apiUrl = `http://localhost:3000/api/tokenDetails`;
-    const fetchDelegatesApiUrl = 'http://localhost:3000/api/delegates';
+    const mintApiUrl = `${BASE_URL}/api/mint`;
+    const burnApiUrl = `${BASE_URL}/api/burn`;
+    const apiUrl = `${BASE_URL}/api/tokenDetails`;
+    const fetchDelegatesApiUrl = `${BASE_URL}/api/delegates`;
 
     useEffect(() => {
         fetchDelegates();

@@ -1,15 +1,10 @@
-// function Freeze() {
-//     return <div><h2>Freeze Page</h2></div>;
-// }
-//
-// export default Freeze;
-
 import React, { useState } from 'react';
 import axios from "axios";
+import { BASE_URL } from '../Constants';
 
 function Freeze() {
-    const freezeApiUrl = 'http://localhost:3000/api/freeze';
-    const unfreezeApiUrl = 'http://localhost:3000/api/unfreeze';
+    const freezeApiUrl = `${BASE_URL}/api/freeze`;
+    const unfreezeApiUrl =  `${BASE_URL}/api/unfreeze`;
 
     const [tokenMintAddress, setTokenMintAddress] = useState('');
     const [account, setAccount] = useState('');

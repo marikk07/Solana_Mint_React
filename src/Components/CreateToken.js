@@ -3,6 +3,7 @@
 import  './Components.css'
 // import {useState} from "react";
 import React, { useState } from 'react';
+import { BASE_URL } from '../Constants';
 
 import axios from "axios";
 
@@ -19,7 +20,7 @@ import axios from "axios";
 
         const [amount, setAmount] = useState("");
         const [tokenMint, setTokenMint] = useState("");
-        const createTokenApiUrl = 'http://localhost:3000/api/createToken';
+        const createTokenApiUrl = `${BASE_URL}/api/createToken`;
 
         async function createToken() {
             if (!name || !symbol || !description || !image) {

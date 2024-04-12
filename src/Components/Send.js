@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from "axios";
-
+import { BASE_URL } from '../Constants';
 const Send = () => {
     const [amount, setAmount] = useState('');
     const [recipientAddress, setRecipientAddress] = useState('');
@@ -9,11 +9,10 @@ const Send = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState('');
 
-    const sendApiUrl = 'http://localhost:3000/api/sendTokens';
+    const sendApiUrl = `${BASE_URL}/api/sendTokens`;
+    const apiUrl = `${BASE_URL}/api/tokenDetails`;
 
     useEffect(() => {
-        const apiUrl = `http://localhost:3000/api/tokenDetails`; // Adjust this URL as needed
-
         fetch(apiUrl)
             .then(response => {
                 if (!response.ok) {

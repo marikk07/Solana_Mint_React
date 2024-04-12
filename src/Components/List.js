@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { BASE_URL } from '../Constants';
 
 function List() {
     const [tokens, setTokens] = useState([]);
@@ -9,7 +10,7 @@ function List() {
     // Function to fetch token details
     const fetchTokens = () => {
         // Replace 'http://localhost:3000' with the actual base URL of your API
-        const apiUrl = `http://localhost:3000/api/tokenDetails`;
+        const apiUrl = `${BASE_URL}/api/tokenDetails`;
         setLoading(true); // Show loading indicator
         setError(''); // Reset previous errors
 

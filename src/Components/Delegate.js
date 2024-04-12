@@ -1,5 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import axios from "axios";
+import { BASE_URL } from '../Constants';
 
 function Delegate() {
     const [tokens, setTokens] = useState([]);
@@ -10,8 +11,8 @@ function Delegate() {
     const [delegateAddress, setDelegateAddress] = useState("");
     const [amount, setAmount] = useState(0);
 
-    const apiUrl = `http://localhost:3000/api/tokenDetails`;
-    const delegateApiUrl = 'http://localhost:3000/api/addDelegate';
+    const apiUrl = `${BASE_URL}/api/tokenDetails`;
+    const delegateApiUrl = `${BASE_URL}/api/addDelegate`;
 
     useEffect(() => {
         fetch(apiUrl)
