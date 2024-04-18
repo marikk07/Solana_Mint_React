@@ -28,7 +28,7 @@ function List() {
 
     // Function to refresh token details
     const refreshTokens = () => {
-        const refreshUrl = `http://localhost:3000/api/refreshTokens`;
+        const refreshUrl = `${BASE_URL}/api/refreshTokens`;
 
         axios.get(refreshUrl)
             .then(() => {
