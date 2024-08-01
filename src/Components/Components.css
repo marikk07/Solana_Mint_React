@@ -1,3 +1,19 @@
 .App {
     text-align: center;
 }
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.public-key-label {
+    margin-right: 20px;
+    font-size: 1rem;
+    font-weight: bold;
+    color: #333;
+    background-color: #f0f0f0; /* Added background color for visibility */
+    padding: 10px; /* Added padding for visibility */
+    border-radius: 5px; /* Added border radius for aesthetics */
+}

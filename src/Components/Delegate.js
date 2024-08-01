@@ -24,9 +24,9 @@ function Delegate() {
             })
             .then((data) => {
                 setTokens(data);
-                // if (data.length > 0) {
-                //     setTokenMint(data[0].tokenMint); // Automatically select the first token mint address
-                // }
+                if (data.length > 0) {
+                    setTokenMint(data[0].mint); // Automatically select the first token mint address
+                }
                 setIsLoading(false);
             })
             .catch((error) => {
@@ -51,7 +51,7 @@ function Delegate() {
 
     async function addDelegate() {
         console.log(`Lets try to add delegate`);
-
+        console.log(`Token mint: `, tokenMint);
         const data = {
             tokenMintAddress: tokenMint,
             // tokenAccountPubkey: tokenAccountPubkey,

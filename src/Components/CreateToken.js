@@ -1,8 +1,7 @@
 // import logo from './logo.svg';
 // import './App.css';
 import  './Components.css'
-// import {useState} from "react";
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { BASE_URL } from '../Constants';
 
 import axios from "axios";
@@ -20,7 +19,27 @@ import axios from "axios";
 
         const [amount, setAmount] = useState("");
         const [tokenMint, setTokenMint] = useState("");
+        const [publicKey, setPublicKey] = useState("");
         const createTokenApiUrl = `${BASE_URL}/api/createToken`;
+        const fetchTokenApiUrl = `${BASE_URL}/api/publicKey`;
+
+        useEffect(() => {
+            fetchPublicKey();
+        }, []);
+
+        async function fetchPublicKey() {
+            try {
+                const response = await axios.get(fetchTokenApiUrl);
+                if (response.data.success) {
+                    setPublicKey(response.data.key);
+                } else {
+                    setFeedback("Failed to fetch public key.");
+                }
+            } catch (error) {
+                console.error('Error fetching public key:', error);
+                setFeedback(`Error fetching public key: ${error.message}`);
+            }
+        }
 
         async function createToken() {
             if (!name || !symbol || !description || !image) {
@@ -71,7 +90,12 @@ import axios from "axios";
         return (
             <div className="App">
                 <div className="App">
-                    <h1>Token Creation</h1>
+                    <div className="header">
+                        <h1>Token Creation</h1>
+                    </div>
+                    <div className="public-key-label">
+                        {publicKey && <span>Public Key: {publicKey}</span>}
+                    </div>
                     <div>
                         <div style={{display: 'flex', justifyContent: 'space-between', padding: '20px'}}>
                             <div>

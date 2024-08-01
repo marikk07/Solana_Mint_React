@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from "axios";
 import { BASE_URL } from '../Constants';
+
 const Send = () => {
     const [amount, setAmount] = useState('');
     const [recipientAddress, setRecipientAddress] = useState('');
@@ -8,6 +9,7 @@ const Send = () => {
     const [selectedTokenMint, setSelectedTokenMint] = useState('');
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState('');
+    const [statusMessage, setStatusMessage] = useState('');
 
     const sendApiUrl = `${BASE_URL}/api/sendTokens`;
     const apiUrl = `${BASE_URL}/api/tokenDetails`;
@@ -36,6 +38,9 @@ const Send = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setStatusMessage('Processing...');
+        setIsLoading(true);
+
         console.log(`Sending ${amount} of selected token (${selectedTokenMint}) to ${recipientAddress}`);
 
         const data = {
@@ -56,14 +61,16 @@ const Send = () => {
             data: data
         };
 
-        axios
-            .request(options)
-            .then(function (response) {
-                console.log(response.data);
-            })
-            .catch(function (error) {
-                console.error(error);
-            });
+        try {
+            const response = await axios.request(options);
+            console.log(response.data);
+            setStatusMessage('Tokens sent successfully!');
+        } catch (error) {
+            console.error(error);
+            setStatusMessage('Failed to send tokens. Please try again.');
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     if (isLoading) {
@@ -104,6 +111,7 @@ const Send = () => {
                 <br />
                 <button type="submit">Send Tokens</button>
             </form>
+            {statusMessage && <p>{statusMessage}</p>}
         </div>
     );
 };

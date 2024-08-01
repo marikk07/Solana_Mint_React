@@ -32,7 +32,7 @@ function MintBurn() {
             .then((data) => {
                 setTokens(data);
                 if (data.length > 0) {
-                    setTokenMint(data[0].tokenMint); // Automatically select the first token mint address
+                    setTokenMint(data[0].mint); // Automatically select the first token mint address
                 }
                 setIsLoading(false);
             })
@@ -75,6 +75,7 @@ function MintBurn() {
         tokenMint, // The mint associated with the token
         amountToBurn // The number of tokens to burn
     ) {
+        setIsLoading(true);
         console.log(`Attempting to burn ${amountToBurn} [${tokenMint}] tokens from Owner Wallet}`);
         const data = {
             tokenMint: tokenMint,
@@ -113,6 +114,7 @@ function MintBurn() {
         tokenMint, // The mint associated with the token
         amountToBurn // The number of tokens to burn
     ) {
+        setIsLoading(true);
         console.log(`Attempting to minToken ${amountToBurn} [${tokenMint}] tokens from Owner Wallet}`);
 
         const data = {
