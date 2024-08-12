@@ -1,5 +1,3 @@
-// import logo from './logo.svg';
-// import './App.css';
 import  './Components.css'
 import React, { useState, useEffect } from 'react';
 import { BASE_URL } from '../Constants';
@@ -115,7 +113,7 @@ import axios from "axios";
                                 </div>
 
                                 <div className="input-group" style={{textAlign: 'right'}}>
-                                    <label htmlFor="image">Enter Image Url:</label>
+                                    <label htmlFor="image">Metadata Json Url:</label>
                                     <input value={image} onChange={(e) => setImage(e.target.value)}/>
                                 </div>
 
